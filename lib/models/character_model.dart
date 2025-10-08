@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
+part 'character_model.g.dart';
+
+@HiveType(typeId: 2)
 class CharacterModel {
+    @HiveField(0)
     final int id;
+    @HiveField(1)
     final String name;
-    final String status;
+    @HiveField(2)
+    final String status; 
+    @HiveField(3)
     final String species;
+    @HiveField(4)
     final String gender;
+    @HiveField(5)
     final String location;
+    @HiveField(6)
     final String image;
 
     CharacterModel({
