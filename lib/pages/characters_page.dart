@@ -14,7 +14,18 @@ class _CharactersPageState extends State<CharactersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Characters Page')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person),
+            SizedBox(width: 8.0),
+            Text("Characters"),
+          ],
+        ),
+        centerTitle: true,
+      ),
       body: FutureBuilder(
         future: apiService.value.fetchCharacters(),
         builder: (context, snapshot) {

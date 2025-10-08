@@ -6,7 +6,18 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorites Page')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.star),
+            SizedBox(width: 8.0),
+            Text("Favorites"),
+          ],
+        ),
+        centerTitle: true,
+      ),
       body: const Center(child: Text('Favorites Page Content')),
     );
   }

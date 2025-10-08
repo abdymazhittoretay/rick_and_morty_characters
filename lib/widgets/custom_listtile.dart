@@ -96,6 +96,12 @@ class CustomListTile extends StatelessWidget {
             ],
           ),
         ),
+        IconButton(
+          padding: EdgeInsets.zero,
+          iconSize: 28.0,
+          onPressed: () {},
+          icon: Icon(Icons.star_border),
+        ),
       ],
     );
   }

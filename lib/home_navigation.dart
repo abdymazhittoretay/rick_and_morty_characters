@@ -40,7 +40,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
             label: 'Characters',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
+            icon: Icon(Icons.star),
             label: 'Favorites',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
