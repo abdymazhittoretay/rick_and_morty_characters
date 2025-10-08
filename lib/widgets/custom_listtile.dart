@@ -11,7 +11,6 @@ class CustomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var box = Hive.box<CharacterModel>('favoritesBox');
-    final bool isSaved = box.values.any((c) => c.id == character.id);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -91,6 +90,7 @@ class CustomListTile extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Location: ${character.location}',
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -99,37 +99,46 @@ class CustomListTile extends StatelessWidget {
             ],
           ),
         ),
-        IconButton(
-          padding: EdgeInsets.zero,
-          iconSize: 28.0,
-          onPressed: () {
-            if (isSaved) {
-              box.delete(character.id);
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  const SnackBar(
-                    backgroundColor: Colors.black87,
-                    content: Center(
-                      child: Text("Removed from Favorites", style: TextStyle()),
-                    ),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-            } else {
-              box.put(character.id, character);
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  const SnackBar(
-                    backgroundColor: Colors.black87,
-                    content: Center(child: Text("Added to Favorites")),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-            }
+        ValueListenableBuilder(
+          valueListenable: box.listenable(),
+          builder: (context, value, child) {
+            final bool isSaved = box.values.any((c) => c.id == character.id);
+            return IconButton(
+              padding: EdgeInsets.zero,
+              iconSize: 28.0,
+              onPressed: () {
+                if (isSaved) {
+                  box.delete(character.id);
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.black87,
+                        content: Center(
+                          child: Text(
+                            "Removed from Favorites",
+                            style: TextStyle(),
+                          ),
+                        ),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                } else {
+                  box.put(character.id, character);
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.black87,
+                        content: Center(child: Text("Added to Favorites")),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                }
+              },
+              icon: Icon(isSaved ? Icons.star : Icons.star_border),
+            );
           },
-          icon: Icon(isSaved ? Icons.star : Icons.star_border),
         ),
       ],
     );
