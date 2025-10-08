@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class CharacterModel {
     final int id;
     final String name;
@@ -55,4 +57,21 @@ class CharacterModel {
         "location": location,
         "image": image,
     };
+}
+
+extension CharacterFormatting on CharacterModel {
+  String get formattedStatus =>
+      status.isNotEmpty ? '${status[0].toUpperCase()}${status.substring(1).toLowerCase()}' : 'Unknown';
+
+  String get formattedGender =>
+      gender.isNotEmpty ? '${gender[0].toUpperCase()}${gender.substring(1).toLowerCase()}' : 'Unknown';
+
+  IconData get genderIcon => switch (gender.toLowerCase()) {
+        'male' => Icons.male,
+        'female' => Icons.female,
+        _ => Icons.person_outline,
+      };
+
+  String get formattedLocation =>
+      location.isNotEmpty ? '${location[0].toUpperCase()}${location.substring(1).toLowerCase()}' : 'Unknown';
 }
