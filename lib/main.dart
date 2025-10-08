@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rick_and_morty_characters/pages/characters_page.dart';
+import 'package:rick_and_morty_characters/home_navigation.dart';
 
 void main() {
   runApp(const MainApp());
@@ -12,7 +12,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: CharactersPage(),
+      home: HomeNavigation(),
     );
   }
 }
