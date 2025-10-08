@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_characters/models/character_model.dart';
 import 'package:rick_and_morty_characters/services/api_service.dart';
+import 'package:rick_and_morty_characters/widgets/my_listview_widget.dart';
 
 class CharactersPage extends StatefulWidget {
   const CharactersPage({super.key});
@@ -34,20 +35,10 @@ class _CharactersPageState extends State<CharactersPage> {
           final List<CharacterModel> characters = snapshot.data!;
 
           if (characters.isEmpty) {
-            return const Center(child: Text("Movie list is empty!"));
+            return const Center(child: Text("Characters list is empty!"));
           }
 
-          return ListView.builder(
-            itemCount: characters.length,
-            itemBuilder: (context, index) {
-              final character = characters[index];
-              return ListTile(
-                leading: Image.network(character.image),
-                title: Text(character.name),
-                subtitle: Text('${character.species} - ${character.status}'),
-              );
-            },
-          );
+          return MyListviewWidget(characters: characters);
         },
       ),
     );
