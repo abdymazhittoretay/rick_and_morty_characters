@@ -7,7 +7,7 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(CharacterModelAdapter());
-  await Hive.openBox<CharacterModel>('favoritesBox');
+  await Hive.openBox<CharacterModel>('favBox');
   runApp(const MainApp());
 }
 

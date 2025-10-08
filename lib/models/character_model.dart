@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 
 part 'character_model.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 3)
 class CharacterModel {
     @HiveField(0)
     final int id;
@@ -19,7 +19,9 @@ class CharacterModel {
     final String location;
     @HiveField(6)
     final String image;
-
+    @HiveField(7)
+    final DateTime? createdAt;
+    
     CharacterModel({
         required this.id,
         required this.name,
@@ -28,6 +30,7 @@ class CharacterModel {
         required this.gender,
         required this.location,
         required this.image,
+        this.createdAt,
     });
 
     CharacterModel copyWith({
@@ -38,6 +41,7 @@ class CharacterModel {
         String? gender,
         String? location,
         String? image,
+        DateTime? createdAt,
     }) => 
         CharacterModel(
             id: id ?? this.id,
@@ -47,6 +51,7 @@ class CharacterModel {
             gender: gender ?? this.gender,
             location: location ?? this.location,
             image: image ?? this.image,
+            createdAt: createdAt ?? this.createdAt,
         );
 
     factory CharacterModel.fromJson(Map<String, dynamic> json) => CharacterModel(

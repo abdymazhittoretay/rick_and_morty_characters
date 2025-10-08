@@ -8,7 +8,7 @@ class FavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var box = Hive.box<CharacterModel>('favoritesBox');
+    var box = Hive.box<CharacterModel>('favBox');
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -24,7 +24,8 @@ class FavoritesPage extends StatelessWidget {
           if (box.isEmpty) {
             return const Center(child: Text("No saved characters yet."));
           }
-          final List<CharacterModel> characters = box.values.toList();
+          final List<CharacterModel> characters = box.values.where((c) => c.createdAt != null).toList()
+            ..sort((a, b) => b.createdAt!.compareTo(a.createdAt!));;
 
           return MyListviewWidget(characters: characters);
         },

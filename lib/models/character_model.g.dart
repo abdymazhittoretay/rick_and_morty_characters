@@ -8,7 +8,7 @@ part of 'character_model.dart';
 
 class CharacterModelAdapter extends TypeAdapter<CharacterModel> {
   @override
-  final int typeId = 2;
+  final int typeId = 3;
 
   @override
   CharacterModel read(BinaryReader reader) {
@@ -24,13 +24,14 @@ class CharacterModelAdapter extends TypeAdapter<CharacterModel> {
       gender: fields[4] as String,
       location: fields[5] as String,
       image: fields[6] as String,
+      createdAt: fields[7] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, CharacterModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class CharacterModelAdapter extends TypeAdapter<CharacterModel> {
       ..writeByte(5)
       ..write(obj.location)
       ..writeByte(6)
-      ..write(obj.image);
+      ..write(obj.image)
+      ..writeByte(7)
+      ..write(obj.createdAt);
   }
 
   @override

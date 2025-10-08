@@ -84,12 +84,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
           Expanded(
             child: _searchResults == null
-                ? const Center(
-                    child: Text(
-                      'Type a name to search characters',
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                  )
+                ? const Center(child: Text('Type a name to search characters.'))
                 : FutureBuilder<List<CharacterModel>>(
                     future: _searchResults,
                     builder: (context, snapshot) {

@@ -10,7 +10,7 @@ class CustomListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var box = Hive.box<CharacterModel>('favoritesBox');
+    var box = Hive.box<CharacterModel>('favBox');
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -124,7 +124,7 @@ class CustomListTile extends StatelessWidget {
                       ),
                     );
                 } else {
-                  box.put(character.id, character);
+                  box.put(character.id, character.copyWith(createdAt: DateTime.now()));
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
