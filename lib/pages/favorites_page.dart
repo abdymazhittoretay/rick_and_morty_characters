@@ -33,8 +33,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Text(
-              '${sortByTime ? "Time" : "Name"} ${ascending ? "↑" : "↓"}',
-              style: const TextStyle(fontSize: 18),
+              '${sortByTime ? "Time" : "Name"} ${ascending ? "asc" : "desc"}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           PopupMenuButton<bool>(
