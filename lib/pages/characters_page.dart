@@ -11,13 +11,46 @@ class CharactersPage extends StatefulWidget {
 }
 
 class _CharactersPageState extends State<CharactersPage> {
+  final List<CharacterModel> _characters = [];
+
+  int _page = 1;
+  bool _isLoading = false;
+  bool _hasMore = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCharacters();
+  }
+
+  Future<void> _fetchCharacters() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final newCharacters = await apiService.value.fetchCharacters(_page);
+
+      setState(() {
+        if (newCharacters.isEmpty) {
+          _hasMore = false;
+        } else {
+          _page++;
+          _characters.addAll(newCharacters);
+        }
+      });
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+
+    setState(() => _isLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.person),
             SizedBox(width: 8.0),
@@ -26,32 +59,24 @@ class _CharactersPageState extends State<CharactersPage> {
         ),
         centerTitle: true,
       ),
-      body: FutureBuilder(
-        future: apiService.value.fetchCharacters(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+      body: _characters.isEmpty && _isLoading
+          ? const Center(
               child: CircularProgressIndicator(color: Colors.black87),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text("${snapshot.error}"));
-          }
-
-          if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text("No data received."));
-          }
-
-          final List<CharacterModel> characters = snapshot.data!;
-
-          if (characters.isEmpty) {
-            return const Center(child: Text("Characters list is empty!"));
-          }
-
-          return MyListviewWidget(characters: characters);
-        },
-      ),
+            )
+          : _characters.isEmpty
+          ? const Center(child: Text("Characters list is empty!"))
+          : NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent - 200 &&
+                    !_isLoading &&
+                    _hasMore) {
+                  _fetchCharacters();
+                }
+                return false;
+              },
+              child: MyListviewWidget(characters: _characters, isLoading: _isLoading, hasMore: _hasMore),
+            ),
     );
   }
 }

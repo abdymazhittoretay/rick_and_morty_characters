@@ -9,8 +9,8 @@ final ValueNotifier<ApiService> apiService = ValueNotifier(ApiService());
 class ApiService {
   final String _baseUrl = 'https://rickandmortyapi.com/api';
 
-  Future<List<CharacterModel>> fetchCharacters() async {
-    final response = await http.get(Uri.parse('$_baseUrl/character'));
+  Future<List<CharacterModel>> fetchCharacters(int page) async {
+    final response = await http.get(Uri.parse('$_baseUrl/character?page=$page'));
     
     if (response.statusCode == 200) {
       final List results = json.decode(response.body)['results'];
