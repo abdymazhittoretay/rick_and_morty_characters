@@ -10,8 +10,10 @@ class ApiService {
   final String _baseUrl = 'https://rickandmortyapi.com/api';
 
   Future<List<CharacterModel>> fetchCharacters(int page) async {
-    final response = await http.get(Uri.parse('$_baseUrl/character?page=$page'));
-    
+    final response = await http.get(
+      Uri.parse('$_baseUrl/character?page=$page'),
+    );
+
     if (response.statusCode == 200) {
       final List results = json.decode(response.body)['results'];
       return results.map((json) => CharacterModel.fromJson(json)).toList();
@@ -20,9 +22,14 @@ class ApiService {
     }
   }
 
-  Future<List<CharacterModel>> fetchCharacterByName(String name) async {
-    final response = await http.get(Uri.parse('$_baseUrl/character?name=$name'));
-    
+  Future<List<CharacterModel>> fetchCharacterByName(
+    String name,
+    int page,
+  ) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/character?name=$name&page=$page'),
+    );
+
     if (response.statusCode == 200) {
       final List results = json.decode(response.body)['results'];
       return results.map((json) => CharacterModel.fromJson(json)).toList();

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_characters/models/character_model.dart';
 import 'package:rick_and_morty_characters/services/api_service.dart';
@@ -12,7 +13,11 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _controller = TextEditingController();
-  Future<List<CharacterModel>>? _searchResults;
+  final List<CharacterModel> _characters = [];
+
+  int _page = 1;
+  bool _isLoading = false;
+  bool _hasMore = true;
 
   @override
   void initState() {
@@ -22,16 +27,42 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void _performSearch(String query) {
-    if (query.trim().isEmpty) {
-      setState(() {
-        _searchResults = null;
-      });
-      return;
-    }
+  void _startNewSearch() {
     setState(() {
-      _searchResults = apiService.value.fetchCharacterByName(query);
+      _characters.clear();
+      _page = 1;
+      _hasMore = true;
+      _isLoading = false;
     });
+    _performSearch(_controller.text);
+  }
+
+  Future<void> _performSearch(String query) async {
+    if (query.trim().isEmpty || _isLoading || !_hasMore) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final newCharacters = await apiService.value.fetchCharacterByName(
+        query,
+        _page,
+      );
+
+      setState(() {
+        if (newCharacters.isEmpty) {
+          _hasMore = false;
+        } else {
+          _page++;
+          _characters.addAll(newCharacters);
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _hasMore = false;
+      });
+      debugPrint("Error: $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -47,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: const [
             Icon(Icons.search),
             SizedBox(width: 8.0),
             Text("Search Characters"),
@@ -61,7 +92,7 @@ class _SearchPageState extends State<SearchPage> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               controller: _controller,
-              onSubmitted: _performSearch,
+              onSubmitted: (_) => _startNewSearch(),
               decoration: InputDecoration(
                 hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search),
@@ -70,9 +101,6 @@ class _SearchPageState extends State<SearchPage> {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _controller.clear();
-                          setState(() {
-                            _searchResults = null;
-                          });
                         },
                       )
                     : null,
@@ -83,24 +111,27 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           Expanded(
-            child: _searchResults == null
-                ? const Center(child: Text('Type a name to search characters.'))
-                : FutureBuilder<List<CharacterModel>>(
-                    future: _searchResults,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+            child: _isLoading && _characters.isEmpty
+                ? const Center(
+                    child: CircularProgressIndicator(color: Colors.black87),
+                  )
+                : _characters.isEmpty
+                ? const Center(child: Text("Search results are empty!"))
+                : NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification.metrics.pixels >=
+                              notification.metrics.maxScrollExtent - 200 &&
+                          !_isLoading &&
+                          _hasMore) {
+                        _performSearch(_controller.text);
                       }
-                      if (snapshot.hasError) {
-                        return Center(child: Text(snapshot.error.toString()));
-                      }
-                      final List<CharacterModel> characters =
-                          snapshot.data ?? [];
-                      if (characters.isEmpty) {
-                        return const Center(child: Text('No results found.'));
-                      }
-                      return MyListviewWidget(characters: characters);
+                      return false;
                     },
+                    child: MyListviewWidget(
+                      characters: _characters,
+                      isLoading: _isLoading,
+                      hasMore: _hasMore,
+                    ),
                   ),
           ),
         ],
