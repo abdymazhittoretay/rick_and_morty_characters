@@ -9,6 +9,7 @@ void main() async{
   Hive.registerAdapter(CharacterModelAdapter());
   await Hive.openBox<CharacterModel>('favBox');
   await Hive.openBox('cacheBox');
+  await Hive.openBox('searchCacheBox');
   runApp(const MainApp());
 }
 

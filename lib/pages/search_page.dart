@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rick_and_morty_characters/models/character_model.dart';
 import 'package:rick_and_morty_characters/services/api_service.dart';
 import 'package:rick_and_morty_characters/widgets/my_listview_widget.dart';
@@ -19,6 +20,8 @@ class _SearchPageState extends State<SearchPage> {
   bool _isLoading = false;
   bool _hasMore = true;
 
+  Box box = Hive.box('searchCacheBox');
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +38,9 @@ class _SearchPageState extends State<SearchPage> {
       _isLoading = false;
     });
     _performSearch(_controller.text);
+    if (_controller.text.isNotEmpty && !box.values.contains(_controller.text)) {
+      box.add(_controller.text);
+    }
   }
 
   Future<void> _performSearch(String query) async {
@@ -101,6 +107,12 @@ class _SearchPageState extends State<SearchPage> {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _controller.clear();
+                          setState(() {
+                            _characters.clear();
+                            _page = 1;
+                            _hasMore = true;
+                            _isLoading = false;
+                          });
                         },
                       )
                     : null,
@@ -116,7 +128,34 @@ class _SearchPageState extends State<SearchPage> {
                     child: CircularProgressIndicator(color: Colors.black87),
                   )
                 : _characters.isEmpty
-                ? const Center(child: Text("Search results are empty!"))
+                ? ValueListenableBuilder(
+                    valueListenable: box.listenable(),
+                    builder: (context, value, child) {
+                      if (box.isEmpty) {
+                        return const Center(child: Text("No search history"));
+                      }
+                      List reversedList = box.values.toList().reversed.toList();
+                      return ListView.builder(
+                        itemCount: reversedList.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(reversedList[index]),
+                            leading: const Icon(Icons.history),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                box.deleteAt(reversedList.length - 1 - index);
+                              },
+                            ),
+                            onTap: () {
+                              _controller.text = reversedList[index];
+                              _startNewSearch();
+                            },
+                          );
+                        },
+                      );
+                    },
+                  )
                 : NotificationListener<ScrollNotification>(
                     onNotification: (notification) {
                       if (notification.metrics.pixels >=
