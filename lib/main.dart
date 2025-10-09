@@ -8,6 +8,7 @@ void main() async{
   await Hive.initFlutter();
   Hive.registerAdapter(CharacterModelAdapter());
   await Hive.openBox<CharacterModel>('favBox');
+  await Hive.openBox('cacheBox');
   runApp(const MainApp());
 }
 
