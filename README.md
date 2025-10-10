@@ -34,5 +34,7 @@
 | **UI**                 | Material Widgets + кастомные карточки персонажей (базовый ListTile мне не нравился) |
 
 Приложение запускал и на ios и на android, все работает нормально
+
 ios: IPhone 19 Plus
+
 android: Medium Phone API 36.0
