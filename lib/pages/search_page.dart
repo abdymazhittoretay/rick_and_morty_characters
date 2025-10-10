@@ -31,21 +31,21 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void startNewSearch() {
+  void _startNewSearch() {
     setState(() {
       _characters.clear();
       _page = 1;
       _hasResults = true;
       _isLoading = false;
     });
-    performSearch(_controller.text);
+    _performSearch(_controller.text);
     if (_controller.text.isNotEmpty &&
         !_box.values.contains(_controller.text)) {
       _box.add(_controller.text);
     }
   }
 
-  Future<void> performSearch(String query) async {
+  Future<void> _performSearch(String query) async {
     if (query.trim().isEmpty || _isLoading || !_hasResults) return;
     setState(() => _isLoading = true);
 
@@ -98,7 +98,7 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           SearchTextFieldWidget(
             controller: _controller,
-            startNewSearch: startNewSearch,
+            startNewSearch: _startNewSearch,
             clearSearch: () {
               _controller.clear();
               setState(() {
@@ -115,8 +115,8 @@ class _SearchPageState extends State<SearchPage> {
             characters: _characters,
             controller: _controller,
             box: _box,
-            performSearch: performSearch,
-            startNewSearch: startNewSearch,
+            performSearch: _performSearch,
+            startNewSearch: _startNewSearch,
           ),
         ],
       ),
