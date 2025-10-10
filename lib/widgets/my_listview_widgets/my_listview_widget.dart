@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_characters/models/character_model.dart';
-import 'package:rick_and_morty_characters/widgets/custom_listtile.dart';
+import 'package:rick_and_morty_characters/widgets/my_listview_widgets/custom_listtile.dart';
 
 class MyListviewWidget extends StatelessWidget {
   final List<CharacterModel> characters;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_characters/models/character_model.dart';
 import 'package:rick_and_morty_characters/services/api_service.dart';
-import 'package:rick_and_morty_characters/widgets/my_listview_widget.dart';
+import 'package:rick_and_morty_characters/widgets/my_listview_widgets/my_listview_widget.dart';
 
 class CharactersPage extends StatefulWidget {
   const CharactersPage({super.key});

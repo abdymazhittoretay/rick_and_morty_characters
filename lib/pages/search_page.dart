@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rick_and_morty_characters/models/character_model.dart';
 import 'package:rick_and_morty_characters/services/api_service.dart';
-import 'package:rick_and_morty_characters/widgets/my_listview_widget.dart';
+import 'package:rick_and_morty_characters/widgets/search_page_widgets/search_info_widget.dart';
+import 'package:rick_and_morty_characters/widgets/search_page_widgets/search_textfield_widget.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -18,9 +19,9 @@ class _SearchPageState extends State<SearchPage> {
 
   int _page = 1;
   bool _isLoading = false;
-  bool _hasMore = true;
+  bool _hasResults = true;
 
-  Box box = Hive.box('searchCacheBox');
+  final Box _box = Hive.box('searchCacheBox');
 
   @override
   void initState() {
@@ -30,21 +31,22 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void _startNewSearch() {
+  void startNewSearch() {
     setState(() {
       _characters.clear();
       _page = 1;
-      _hasMore = true;
+      _hasResults = true;
       _isLoading = false;
     });
-    _performSearch(_controller.text);
-    if (_controller.text.isNotEmpty && !box.values.contains(_controller.text)) {
-      box.add(_controller.text);
+    performSearch(_controller.text);
+    if (_controller.text.isNotEmpty &&
+        !_box.values.contains(_controller.text)) {
+      _box.add(_controller.text);
     }
   }
 
-  Future<void> _performSearch(String query) async {
-    if (query.trim().isEmpty || _isLoading || !_hasMore) return;
+  Future<void> performSearch(String query) async {
+    if (query.trim().isEmpty || _isLoading || !_hasResults) return;
     setState(() => _isLoading = true);
 
     try {
@@ -55,7 +57,7 @@ class _SearchPageState extends State<SearchPage> {
 
       setState(() {
         if (newCharacters.isEmpty) {
-          _hasMore = false;
+          _hasResults = false;
         } else {
           _page++;
           _characters.addAll(newCharacters);
@@ -63,7 +65,7 @@ class _SearchPageState extends State<SearchPage> {
       });
     } catch (e) {
       setState(() {
-        _hasMore = false;
+        _hasResults = false;
       });
       debugPrint("Error: $e");
     } finally {
@@ -94,84 +96,27 @@ class _SearchPageState extends State<SearchPage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              controller: _controller,
-              onSubmitted: (_) => _startNewSearch(),
-              decoration: InputDecoration(
-                hintText: 'Search...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _controller.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _controller.clear();
-                          setState(() {
-                            _characters.clear();
-                            _page = 1;
-                            _hasMore = true;
-                            _isLoading = false;
-                          });
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
+          SearchTextFieldWidget(
+            controller: _controller,
+            startNewSearch: startNewSearch,
+            clearSearch: () {
+              _controller.clear();
+              setState(() {
+                _characters.clear();
+                _page = 1;
+                _hasResults = true;
+                _isLoading = false;
+              });
+            },
           ),
-          Expanded(
-            child: _isLoading && _characters.isEmpty
-                ? const Center(
-                    child: CircularProgressIndicator(color: Colors.black87),
-                  )
-                : _characters.isEmpty
-                ? ValueListenableBuilder(
-                    valueListenable: box.listenable(),
-                    builder: (context, value, child) {
-                      if (box.isEmpty) {
-                        return const Center(child: Text("No search history"));
-                      }
-                      List reversedList = box.values.toList().reversed.toList();
-                      return ListView.builder(
-                        itemCount: reversedList.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(reversedList[index]),
-                            leading: const Icon(Icons.history),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () {
-                                box.deleteAt(reversedList.length - 1 - index);
-                              },
-                            ),
-                            onTap: () {
-                              _controller.text = reversedList[index];
-                              _startNewSearch();
-                            },
-                          );
-                        },
-                      );
-                    },
-                  )
-                : NotificationListener<ScrollNotification>(
-                    onNotification: (notification) {
-                      if (notification.metrics.pixels >=
-                              notification.metrics.maxScrollExtent - 200 &&
-                          !_isLoading &&
-                          _hasMore) {
-                        _performSearch(_controller.text);
-                      }
-                      return false;
-                    },
-                    child: MyListviewWidget(
-                      characters: _characters,
-                      isLoading: _isLoading,
-                      hasMore: _hasMore,
-                    ),
-                  ),
+          SearchInfoWidget(
+            isLoading: _isLoading,
+            hasResults: _hasResults,
+            characters: _characters,
+            controller: _controller,
+            box: _box,
+            performSearch: performSearch,
+            startNewSearch: startNewSearch,
           ),
         ],
       ),
